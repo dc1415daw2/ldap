@@ -7,8 +7,6 @@ if (isset($_POST['usuari']))
     $ldapou = trim($_POST['ou']);
     $base_dn = "ou=".$ldapou.",dc=".$DOMINI.",dc=".$TLD;
     $filtre = "(uid=$ldapuser)";
-    echo "$base_dn<br>";
-    echo "$filtre<br>";
     // Connexió amb el servidor openLDAP	
     $ldapconn = ldap_connect($ldaphost) or die("Could not connect to LDAP server.");
     ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -17,9 +15,6 @@ if (isset($_POST['usuari']))
         $ldapbind = ldap_bind($ldapconn, $_SESSION['ldaprdn'], $_SESSION['ldappass']);
 	if ($ldapbind) {
             $search = ldap_search($ldapconn, $base_dn, $filtre);
-            echo "$search<br>";
-            $valor=isset($search);
-            echo "$valor<br>";
             if ($search!=""){
                 $info = ldap_get_entries($ldapconn, $search);
                 //Ara, visualitzarem les dades de l'usuari:

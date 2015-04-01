@@ -9,10 +9,11 @@
 ?>
 <html>
 	<head>
-		<title>P&agrave;gina d'error en l'identificaci&oacute; o modificació de l'usuari del qual es volen mostrar o modificar les deades</title>
+		<title>P&agrave;gina d'error en l'identificaci&oacute;, afegiment, esborrament o modificació de l'usuari</title>
 	</head>
 	<body>
-		La identificaci&oacute; de l'usuari del qual es volen mostrar les dades és err&ograve;nia<br>
-                <a href="error_usuari.php?logout">Retorn a l'inici de l'apliaci&oacute;</a>		
+            El proc&eacute;s d'identificaci&oacute;, afegiment, esborrament o modificació de l'usuari amb el qual es vol treballar ha tingut un error.<br>
+            Si us plau, intenteu realitzar el proc&eacute;s novament.<br>
+            <a href="error_usuari.php?logout">Retorn a l'inici de l'apliaci&oacute;</a>		
 	</body>
 </html>

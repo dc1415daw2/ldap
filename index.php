@@ -26,11 +26,10 @@ if( isset($_POST['login']) && isset($_POST['password']))
     }
     ldap_close($ldapconn);
 }
-session_destroy();
 ?>
 <html>
     <head>
-        <title>P&agrave;gina d'autenticaci&oacute; de l'administrador del domini fjeclot.net;</title>
+        <title>P&agrave;gina d'autenticaci&oacute; de l'administrador del domini</title>
     </head>
     <body>	
         <form action=index.php method=post>

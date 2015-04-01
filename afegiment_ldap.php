@@ -79,7 +79,6 @@ $ldapconn = ldap_connect($ldaphost) or die("No s'ha pogut establir una connexi&o
 ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
 if ($ldapconn) {
     // Autenticació al servidor openLDAP i afegint dades d'un nou usuari
-    //echo $_SESSION['ldaprdn']."<br>";
     $ldapbind = ldap_bind($ldapconn, $_SESSION['ldaprdn'], $_SESSION['ldappass']);
     if ($ldapbind) {
         $dades_usuari["objectclass"][0] = "top";

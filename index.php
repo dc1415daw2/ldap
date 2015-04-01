@@ -45,7 +45,7 @@ if( isset($_POST['login']) && isset($_POST['password']))
 		</tr>
 		<tr>
                     <td><input type=submit value=Autenticaci&oacute;></td>
-        	</tr>
+                </tr>
             </table>
 	</form>
     </body>

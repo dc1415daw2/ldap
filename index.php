@@ -44,8 +44,8 @@ if( isset($_POST['login']) && isset($_POST['password']))
                     <td><input type=password name=password size=16 maxlength=15></td>
 		</tr>
 		<tr>
-                    <td colspan=2><input type=submit value=Autenticaci&oacute;></td>
-		</tr>
+                    <td><input type=submit value=Autenticaci&oacute;></td>
+        	</tr>
             </table>
 	</form>
     </body>

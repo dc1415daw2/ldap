@@ -82,19 +82,19 @@ if ($ldapconn) {
     //echo $_SESSION['ldaprdn']."<br>";
     $ldapbind = ldap_bind($ldapconn, $_SESSION['ldaprdn'], $_SESSION['ldappass']);
     if ($ldapbind) {
-        $dades_usuari["objectclass"] = "top";
-        $dades_usuari["objectclass"] = "person";
-        $dades_usuari["objectclass"] = "organizationalPerson";
-        $dades_usuari["objectclass"] = "inetOrgPerson";
-        $dades_usuari["objectclass"] = "posixAccount";
-        $dades_usuari["objectclass"] = "shadowAccount";
-        $dades_usuari["cn"] = $_POST['nom'] . $_POST['cognom'];
+        $dades_usuari["objectclass"][0] = "top";
+        $dades_usuari["objectclass"][1] = "person";
+        $dades_usuari["objectclass"][2] = "organizationalperson";
+        $dades_usuari["objectclass"][3] = "inetorgperson";
+        $dades_usuari["objectclass"][4] = "posixaccount";
+        $dades_usuari["objectclass"][5] = "shadowaccount";
+        $dades_usuari["cn"] = $_POST['nom'].$_POST['cognom'];
         $dades_usuari["sn"] = trim($_POST['cognom']);
         $dades_usuari["givenname"] = trim($_POST['nom']);
         $dades_usuari["title"] = $_POST['titol'];
         $dades_usuari["telephonenumber"] = $_POST['telefon'];
         $dades_usuari["mobile"] = $_POST['mobil'];
-        $dades_usuari["postaladdress"] = $_POST['addressa'];
+        $dades_usuari["postaladdress"] = $_POST['adressa'];
         $dades_usuari["description"] = $_POST['descripcio'];
         $dades_usuari["uid"] = trim($_POST['idusr']);
         $dades_usuari["ou"] = trim($_POST['unitorg']);
@@ -105,15 +105,14 @@ if ($ldapconn) {
         $ctrsnya_codif = "{SHA}" . base64_encode(pack("H*", sha1($ctrsnya)));
         $dades_usuari["userpassword"] = $ctrsnya_codif;
         $dn = 'uid=' . $dades_usuari["uid"] . ',ou=' . $dades_usuari["ou"] . ',dc=' . $DOMINI . ',dc=' . $TLD;
-        echo "$dn<br>";
-        /*if ((dades_usuari["uid"]!="") && ($dades_usuari["ou"]!="")){
+        if ((dades_usuari["uid"]!="") && ($dades_usuari["ou"]!="")){
             $res_add=ldap_add($ldapconn, $dn, $dades_usuari);
             if(!$res_add){
-                echo "LDAP-Errno: " . ldap_errno($ldapconn) . "<br />\n";
-                echo "LDAP-Error: " . ldap_error($ldapconn) . "<br />\n";
-                //header('Location: error_usuari.php');
+                //echo "LDAP-Errno: " . ldap_errno($ldapconn) . "<br />\n";
+                //echo "LDAP-Error: " . ldap_error($ldapconn) . "<br />\n";
+                header('Location: error_usuari.php');
             }
-        }*/
+        }
     }
     else {
         header('Location: error_admin.php');

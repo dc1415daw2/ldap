@@ -1,54 +1,29 @@
-<html>
-	<head>
-		<title> Cerca de les dades d'un usuari</title>
-	</head>
-	<body>
-		<form action=cerca_ldap.php method=post>		
-			<b>Indica l'usuari del domini sobre el qual vols trobar informaci&oacute;:</b><br><br>			
-			<table cellspacing=3 cellpadding=3>
-		   		<tr>
-			  		<td>Nom de l'usuari: </td>
-			  		<td><input type=text name=usuari size=16 maxlength=15></td>
-		   		</tr>
-		   		<tr>
-			  		<td>Unitat organitzativa: </td>
-			  		<td><input type=text name=ou size=16 maxlength=15></td>
-		   		</tr>
-		   		<tr>
-			  		<td colspan=2><input type=submit value=Envia></td>
-		   		</tr>
-			</table>
-		</form>
-		<a href="cerca_ldap.php?logout">Retorno a l'inici de l'aplicaci&oacute;</a><br><br>
-	</body>	
-</html>
-
 <?php
+include("config.php");
 session_start(); 
-$TLD="net";
-$DOMAIN="fjeclot";
-$NOMSRV="srvapl";
-$SERVER="$NOMSRV.$DOMAIN.$TLD";
 if (isset($_POST['usuari']))
 {
-    $ldaphost = "ldap://$SERVER";
     $ldapuser = trim($_POST['usuari']);
     $ldapou = trim($_POST['ou']);
-    $ldaplogin=trim($_SESSION['login']);
-    $ldaprdn  = 'cn='.$ldaplogin.',dc='.$DOMINI.',dc='.$TLD;
-    $ldappass = trim($_SESSION['password']);
+    $base_dn = "ou=".$ldapou.",dc=".$DOMINI.",dc=".$TLD;
+    $filtre = "(uid=$ldapuser)";
+    echo "$base_dn<br>";
+    echo "$filtre<br>";
     // Connexió amb el servidor openLDAP	
     $ldapconn = ldap_connect($ldaphost) or die("Could not connect to LDAP server.");
     ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
     if ($ldapconn) {
 	// Autenticant-se de nou com administrador al servidor openLDAP i accedint a les dades d'un usuari
-	$ldapbind = ldap_bind($ldapconn, $ldaprdn, $ldappass);
+        $ldapbind = ldap_bind($ldapconn, $_SESSION['ldaprdn'], $_SESSION['ldappass']);
 	if ($ldapbind) {
-            $search = ldap_search($ldapconn, "dc=$DOMAIN,dc=$TLD", "uid=".$ldapuser);
-            if (isset($search)){
+            $search = ldap_search($ldapconn, $base_dn, $filtre);
+            echo "$search<br>";
+            $valor=isset($search);
+            echo "$valor<br>";
+            if ($search!=""){
                 $info = ldap_get_entries($ldapconn, $search);
                 //Ara, visualitzarem les dades de l'usuari:
-                echo "<b><u>Dades de l'usuari dn: uid=".$ldapuser.",ou=".$ldapou.",dc=".$DOMAIN.",dc=".$TLD.":</u></b><br>";
+                echo "<b><u>Dades de l'usuari dn: uid=".$ldapuser.",ou=".$ldapou.",dc=".$DOMINI.",dc=".$TLD.":</u></b><br>";
                 for ($i=0; $i<$info["count"]; $i++)
                 {
                     echo "<b>Nom:</b> ".$info[$i]["cn"][0]. "<br />";
@@ -62,6 +37,7 @@ if (isset($_POST['usuari']))
                     echo "<b>Grup de l'usuari per defecte:</b> ".$info[$i]["gidnumber"][0]. "<br />";
                     echo "<b>Directori personal:</b> ".$info[$i]["homedirectory"][0]. "<br />";
                     echo "<b>Shell de l'usuari:</b> ".$info[$i]["loginshell"][0]. "<br />";
+                    echo "<br />";
                 }
             }
             else{
@@ -75,8 +51,35 @@ if (isset($_POST['usuari']))
     ldap_close($ldapconn);
 }
 // Log OUT
-if(isset($_GET['logout']))	{
-    session_destroy();
-    header('Location: index.php');
+if(isset($_GET['logout'])) {
+    session_unset();
+    if (session_destroy()){
+        header('Location: index.php');
+    }
 }
 ?>
+
+<html>
+    <head>
+        <title> Cerca de les dades d'un usuari</title>
+    </head>
+    <body>
+        <form action=cerca_ldap.php method=post>		
+            <b><u>Indica l'usuari del domini sobre el qual vols trobar informaci&oacute;:</u></b><br>			
+            <table cellspacing=3 cellpadding=3>
+		<tr>
+                    <td>Nom de l'usuari: </td>
+                    <td><input type=text name=usuari size=16 maxlength=15></td>
+		</tr>
+		<tr>
+                    <td>Unitat organitzativa: </td>
+                    <td><input type=text name=ou size=16 maxlength=15></td>
+		</tr>
+		<tr>
+                    <td colspan=2><input type=submit value=Envia></td>
+		</tr>
+            </table>
+	</form>
+	<a href="cerca_ldap.php?logout">Retorno a l'inici de l'aplicaci&oacute;</a><br><br>
+    </body>	
+</html>

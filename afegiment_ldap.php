@@ -87,7 +87,7 @@ if ($ldapconn) {
         $dades_usuari["objectclass"][3] = "inetorgperson";
         $dades_usuari["objectclass"][4] = "posixaccount";
         $dades_usuari["objectclass"][5] = "shadowaccount";
-        $dades_usuari["cn"] = $_POST['nom'].$_POST['cognom'];
+        $dades_usuari["cn"] = $_POST['nom']." ".$_POST['cognom'];
         $dades_usuari["sn"] = trim($_POST['cognom']);
         $dades_usuari["givenname"] = trim($_POST['nom']);
         $dades_usuari["title"] = $_POST['titol'];

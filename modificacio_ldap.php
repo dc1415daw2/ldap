@@ -8,11 +8,11 @@
             <table cellspacing=3 cellpadding=3>
                 <tr>
                     <td>Identificador (login) de l'usuari:</td>
-                    <td><input type=text name=idusr size=16 maxlength=15></td>
+                    <td><input type=text name=idusr size=21 maxlength=20></td>
                 </tr>
                 <tr>
                     <td>Unitat organitzativa de l'usuari:</td>
-                   <td><input type=text name=unitorg size=16 maxlength=15></td>
+                   <td><input type=text name=unitorg size=21 maxlength=20></td>
                 </tr>
             </table>
             <tr>
@@ -27,9 +27,6 @@
                 <tr>
                     <td><input type=radio name=dada value='title'>C&agrave;rrec o t&iacute;tol de l'usuari</td>
                 </tr>		
-                <tr>
-                    <td><input type=radio name=dada value='title'>C&agrave;rrec o t&iacute;tol de l'usuari</td>
-                </tr>                                
                 <tr>
                     <td><input type=radio name=dada value='telephonenumber'>Tel&egrave;fon fixe de l'usuari</td>
                 </tr>
@@ -57,35 +54,51 @@
                 <tr>
                     <td><input type=radio name=dada value='userpassword'>Contrasenya de l'usuari</td>
                 </tr>    
-                <tr>
-                    <td colspan=2><input type=submit value='Envia'></td>
-                </tr>				
             </table>
+            <b><u>Indica el nou valor de les dades de l'usuari:</u></b><br>
+            <table cellspacing=3 cellpadding=3>
+                <tr>
+                    <td>Indica el nou valor:</td>
+                    <td><input type=text name=novadada></td>
+                </tr>
+            </table>
+            <input type=submit value='Envia'>
 	</form>
 	<a href="modificacio_ldap.php?logout">Retorno a l'inici de l'aplicaci&oacute;</a><br><br>
     </body>	
 </html>
 
 <?php
+include("config.php");
 session_start(); 
-$TLD="net";
-$DOMAIN="fjeclot";
-$NOMSRV="srvapl";
-$SERVER="$NOMSRV.$DOMAIN.$TLD";
 if (isset($_POST['idusr']) && isset($_POST['unitorg'])){
     // Connexió amb el servidor openLDAP
-    $ldaphost = "ldap://$SERVER";
-    $ldaplogin=trim($_SESSION['login']);
-    $ldaprdn  = 'cn='.$ldaplogin.',dc='.$DOMINI.',dc='.$TLD;
-    $ldappass = trim($_SESSION['password']);
     $ldapconn = ldap_connect($ldaphost) or die("No s'ha pogut establir una connexi&oacute; al servidor LDAP");
     ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
     if($ldapconn){
        // Autenticant-se de nou com administrador al servidor openLDAP i accedint a les dades d'un usuari
-	$ldapbind = ldap_bind($ldapconn, $ldaprdn, $ldappass);
-        if ($ldapbind) {
-            $dn='uid='.$dades_usuari["uid"].',ou='.$dades_usuari["ou"].',dc='.$DOMAIN.',dc='.$TLD;
-            header('Location: gest_mod.php');
+        $ldapbind = ldap_bind($ldapconn, $_SESSION['ldaprdn'], $_SESSION['ldappass']);
+	if ($ldapbind) {
+            $dn='uid='.$_POST['idusr'].',ou='.$_POST['unitorg'].',dc='.$DOMINI.',dc='.$TLD;
+            if (($_POST['dada']=="uidnumber") || ($_POST['dada']=="gidnumber")) {
+                $int_novadada=intval($_POST['novadada']);
+                $entrada[$_POST['dada']]=$int_novadada;
+                if (ldap_modify($ldapconn,$dn,$entrada)==FALSE){
+                    header('Location: error_usuari.php');
+                }
+                else {
+                    echo "<b>S'han modificat les dades!!!!!!!</b><br>";
+                }
+            }
+            else {
+                $entrada[$_POST['dada']]=$_POST['novadada'];
+                if (ldap_modify($ldapconn,$dn,$entrada)==FALSE){
+                    header('Location: error_usuari.php');
+                }
+                else {
+                    echo "<b>S'han modificat les dades!!!!!!!</b><br>";
+                }
+            }
         }
         else {
             header('Location: error_admin.php');
@@ -94,8 +107,10 @@ if (isset($_POST['idusr']) && isset($_POST['unitorg'])){
     ldap_close($ldapconn);
 }    
 // Log OUT
-if(isset($_GET['logout']))	{
-    session_destroy();
-    header('Location: index.php');
+if(isset($_GET['logout'])) {
+    session_unset();
+    if (session_destroy()){
+        header('Location: index.php');
+    }
 }
 ?>
